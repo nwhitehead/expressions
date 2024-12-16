@@ -4,6 +4,10 @@ import crypto from 'crypto';
 import WebSocket from 'isomorphic-ws';
 import axios from 'axios';
 
+// Import the framework and instantiate it
+import Fastify from 'fastify';
+
+// Where to connect to talk to ComfyUI
 const COMFY_SERVER_ADDRESS = "127.0.0.1:8188";
 const CLIENT_ID = crypto.randomUUID();
 
@@ -106,7 +110,30 @@ async function main() {
     const outputImgData = await queue_prompt(prompt, inputImgData, 2);
     fs.writeFileSync('images/out.png', outputImgData);
     console.log('Wrote images/out.png');
-    process.exit(0);
+    //process.exit(0);
 }
 
 main();
+
+const fastify = Fastify({
+    logger: true,
+});
+
+fastify.route({
+    method: 'POST',
+    url: '/transform',
+    handler: async (request, reply) => {
+        return { hello: 'world' }
+    },
+});
+
+// For us to serve
+const SERVER_PORT = 8288;
+
+fastify.listen({ port: SERVER_PORT }, function (err, address) {
+    if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+    }
+    // Server is now listening on ${address}
+});
