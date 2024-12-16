@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import WebSocket from 'isomorphic-ws';
 import axios from 'axios';
 
-const SERVER_ADDRESS = "127.0.0.1:8188";
+const COMFY_SERVER_ADDRESS = "127.0.0.1:8188";
 const CLIENT_ID = crypto.randomUUID();
 
 const prompt = {
@@ -56,19 +56,19 @@ const prompt = {
   }
 };
 
-function queue_prompt(prompt) {
+function queue_prompt(prompt, inputImgData, blink) {
     return new Promise((resolve, reject) => {
-        const ws = new WebSocket(`ws://${SERVER_ADDRESS}/ws?clientId=${CLIENT_ID}`);
+        const ws = new WebSocket(`ws://${COMFY_SERVER_ADDRESS}/ws?clientId=${CLIENT_ID}`);
 
-        const inputImgData = fs.readFileSync('images/katia.jpg');
         const b64data = Buffer.from(inputImgData, 'binary').toString('base64');
         prompt["3"]["inputs"]["image"] = b64data;
-    
+        prompt["2"]["inputs"]["blink"] = blink;
         const p = { prompt, client_id: CLIENT_ID };
         const data = JSON.stringify(p);
+        let result = null;
         ws.onopen = async function () {
             try {
-                const response = await axios.post(`http://${SERVER_ADDRESS}/prompt`, data);
+                const response = await axios.post(`http://${COMFY_SERVER_ADDRESS}/prompt`, data);
                 const prompt_id = response.data.prompt_id;
                 // Wait for progress message for right node (1 image output)
                 let ready = false;
@@ -79,7 +79,7 @@ function queue_prompt(prompt) {
                             ready = true;
                         } else if (data.type === 'executing' && data.data.prompt_id === prompt_id && data.data.node === null) {
                             // Resolve queue_prompt promise
-                            resolve();
+                            resolve(result);
                         } else {
                             ready = false;
                         }
@@ -87,8 +87,7 @@ function queue_prompt(prompt) {
                         // Handle binary image output data
                         if (ready) {
                             // Ignore first 8 bytes, they are 0x1 0x2 (not sure why)
-                            fs.writeFileSync('images/out.png', msg.data.slice(8));
-                            console.log('Wrote images/out.png');
+                            result = msg.data.slice(8);
                             ready = false;
                         }
                     }
@@ -103,8 +102,11 @@ function queue_prompt(prompt) {
 }
 
 async function main() {
-    await queue_prompt(prompt);
+    const inputImgData = fs.readFileSync('images/katia.jpg');
+    const outputImgData = await queue_prompt(prompt, inputImgData, 2);
+    fs.writeFileSync('images/out.png', outputImgData);
+    console.log('Wrote images/out.png');
     process.exit(0);
 }
 
-main()
+main();
