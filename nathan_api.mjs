@@ -71,6 +71,9 @@ function queue_prompt(prompt, args) {
         prompt["2"]["inputs"]["rotate_roll"] = args.rotate_roll;
         prompt["2"]["inputs"]["blink"] = args.blink;
         prompt["2"]["inputs"]["eyebrow"] = args.eyebrow;
+        prompt["2"]["inputs"]["wink"] = args.wink;
+        prompt["2"]["inputs"]["pupil_x"] = args.pupil_x;
+        prompt["2"]["inputs"]["pupil_y"] = args.pupil_y;
         const p = { prompt, client_id: CLIENT_ID };
         const data = JSON.stringify(p);
         let result = null;
@@ -127,6 +130,9 @@ fastify.route({
             rotate_roll:request.body.rotate_roll,
             blink:request.body.blink,
             eyebrow:request.body.eyebrow,
+            wink:request.body.wink,
+            pupil_x:request.body.pupil_x,
+            pupil_y:request.body.pupil_y,
         });
         return { image: outputImgData.toString('base64') };
     },
