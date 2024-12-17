@@ -78,6 +78,7 @@ function queue_prompt(prompt, args) {
         prompt["2"]["inputs"]["eee"] = args.eee;
         prompt["2"]["inputs"]["woo"] = args.woo;
         prompt["2"]["inputs"]["smile"] = args.smile;
+        prompt["2"]["inputs"]["crop_factor"] = args.crop_factor;
         const p = { prompt, client_id: CLIENT_ID };
         const data = JSON.stringify(p);
         let result = null;
@@ -141,6 +142,7 @@ fastify.route({
             eee:request.body.eee,
             woo:request.body.woo,
             smile:request.body.smile,
+            crop_factor:request.body.crop_factor,
         });
         return { image: outputImgData.toString('base64') };
     },
