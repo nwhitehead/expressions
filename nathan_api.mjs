@@ -105,15 +105,7 @@ function queue_prompt(prompt, inputImgData, blink) {
     });
 }
 
-async function main() {
-    const inputImgData = fs.readFileSync('images/katia.jpg');
-    const outputImgData = await queue_prompt(prompt, inputImgData, 2);
-    fs.writeFileSync('images/out.png', outputImgData);
-    console.log('Wrote images/out.png');
-    //process.exit(0);
-}
-
-main();
+//////////////////////////////////////////////////////////////////////////////////
 
 const fastify = Fastify({
     logger: true,
@@ -123,7 +115,9 @@ fastify.route({
     method: 'POST',
     url: '/transform',
     handler: async (request, reply) => {
-        return { hello: 'world' }
+        const imgData = Buffer.from(request.body.inputImgData, 'base64');
+        const outputImgData = await queue_prompt(prompt, imgData, request.body.blink);
+        return { image: outputImgData.toString('base64') };
     },
 });
 

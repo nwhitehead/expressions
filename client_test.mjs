@@ -10,9 +10,10 @@ const inputImgData = fs.readFileSync('images/katia.jpg');
 const b64data = Buffer.from(inputImgData, 'binary').toString('base64');
 
 async function main() {
-    const data = {};
+    const data = { inputImgData: b64data, blink: -20 };
     const response = await axios.post(`http://${SERVER_ADDRESS}/transform`, data);
-    console.log(response.data);
+    const outImage = Buffer.from(response.data.image, 'base64');
+    fs.writeFileSync('images/out_client.png', outImage);
 }
 
 main();
