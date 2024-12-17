@@ -14,7 +14,8 @@ async function main() {
         blink: 0,
         rotate_pitch: 0,
         rotate_yaw: 0,
-        rotate_roll: 10,
+        rotate_roll: 0,
+        eyebrow: 0,
     };
     const response = await axios.post(`http://${SERVER_ADDRESS}/transform`, data);
     const outImage = Buffer.from(response.data.image, 'base64');

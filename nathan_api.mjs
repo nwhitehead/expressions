@@ -66,10 +66,11 @@ function queue_prompt(prompt, args) {
 
         const b64data = Buffer.from(args.inputImgData, 'binary').toString('base64');
         prompt["3"]["inputs"]["image"] = b64data;
-        prompt["2"]["inputs"]["blink"] = args.blink;
         prompt["2"]["inputs"]["rotate_pitch"] = args.rotate_pitch;
         prompt["2"]["inputs"]["rotate_yaw"] = args.rotate_yaw;
         prompt["2"]["inputs"]["rotate_roll"] = args.rotate_roll;
+        prompt["2"]["inputs"]["blink"] = args.blink;
+        prompt["2"]["inputs"]["eyebrow"] = args.eyebrow;
         const p = { prompt, client_id: CLIENT_ID };
         const data = JSON.stringify(p);
         let result = null;
@@ -121,10 +122,11 @@ fastify.route({
         const imgData = Buffer.from(request.body.inputImgData, 'base64');
         const outputImgData = await queue_prompt(prompt, {
             inputImgData:imgData,
-            blink:request.body.blink,
             rotate_pitch:request.body.rotate_pitch,
             rotate_yaw:request.body.rotate_yaw,
             rotate_roll:request.body.rotate_roll,
+            blink:request.body.blink,
+            eyebrow:request.body.eyebrow,
         });
         return { image: outputImgData.toString('base64') };
     },
