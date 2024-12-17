@@ -13,15 +13,16 @@ async function main() {
         inputImgData: b64data,
         blink: 0,
         rotate_pitch: 0,
-        rotate_yaw: 0,
+        rotate_yaw: -20,
         rotate_roll: 0,
-        eyebrow: 0,
+        eyebrow: -10,
         wink: 0,
-        pupil_x: 0,
+        pupil_x: 10,
         pupil_y: 0,
-        aaa: 0,
+        mouth: 50,
         eee: 0,
         woo: 10,
+        smile: -0.3,
     };
     const response = await axios.post(`http://${SERVER_ADDRESS}/transform`, data);
     const outImage = Buffer.from(response.data.image, 'base64');
