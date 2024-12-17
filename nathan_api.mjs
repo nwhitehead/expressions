@@ -60,13 +60,16 @@ const prompt = {
   }
 };
 
-function queue_prompt(prompt, inputImgData, blink) {
+function queue_prompt(prompt, args) {
     return new Promise((resolve, reject) => {
         const ws = new WebSocket(`ws://${COMFY_SERVER_ADDRESS}/ws?clientId=${CLIENT_ID}`);
 
-        const b64data = Buffer.from(inputImgData, 'binary').toString('base64');
+        const b64data = Buffer.from(args.inputImgData, 'binary').toString('base64');
         prompt["3"]["inputs"]["image"] = b64data;
-        prompt["2"]["inputs"]["blink"] = blink;
+        prompt["2"]["inputs"]["blink"] = args.blink;
+        prompt["2"]["inputs"]["rotate_pitch"] = args.rotate_pitch;
+        prompt["2"]["inputs"]["rotate_yaw"] = args.rotate_yaw;
+        prompt["2"]["inputs"]["rotate_roll"] = args.rotate_roll;
         const p = { prompt, client_id: CLIENT_ID };
         const data = JSON.stringify(p);
         let result = null;
@@ -116,7 +119,13 @@ fastify.route({
     url: '/transform',
     handler: async (request, reply) => {
         const imgData = Buffer.from(request.body.inputImgData, 'base64');
-        const outputImgData = await queue_prompt(prompt, imgData, request.body.blink);
+        const outputImgData = await queue_prompt(prompt, {
+            inputImgData:imgData,
+            blink:request.body.blink,
+            rotate_pitch:request.body.rotate_pitch,
+            rotate_yaw:request.body.rotate_yaw,
+            rotate_roll:request.body.rotate_roll,
+        });
         return { image: outputImgData.toString('base64') };
     },
 });
